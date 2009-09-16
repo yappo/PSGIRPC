@@ -1,0 +1,36 @@
+
+Request
+[version mabor].[version minor] [ request id ] [serialize type] [header size]<CR><LF>
+[ serialized header ]<CR><LF>
+[ body size ]<CR><LF>
+[ body ]<CR><LF>
+
+Response
+[version mabor].[version minor] [ request id ] [serialize type] [header size] [ http status code]<CR><LF>
+[ serialized header ]<CR><LF>
+[ body size ]<CR><LF>
+[ body ]<CR><LF>
+
+
+body はストリームできるようにどうにかする
+
+
+
+
+下はボツ
+
+[ REQUEST HEADER ]
+0x00 = version major
+0x01 = version minor
+0x02 = serialize type ( 0: json, 1: MessagePack, 2: Storable, 3: Data::Dumper )
+0x04 = header size (highe)
+0x05 = header size (low)
+0x06- = serialized header
+
+[ REQUEST CHANKED BODY ]
+0x00 = body size (high)
+0x01 = body size (low)
+0x02- = body
+
+# 全ファイルの body size を送信しきるまで、 body chank が続く
+# body size が 0 のチャンクに来たら body 終了
