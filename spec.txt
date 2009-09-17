@@ -1,12 +1,14 @@
 
 Request
 [version mabor].[version minor] [ request id ] [serialize type] [header size]<CR><LF>
+[ client library name ]<CR><LF>
 [ serialized header ]<CR><LF>
 [ body size ]<CR><LF>
 [ body ]<CR><LF>
 
 Response
 [version mabor].[version minor] [ request id ] [serialize type] [header size] [ http status code]<CR><LF>
+[ server library name ]<CR><LF>
 [ serialized header ]<CR><LF>
 [ body size ]<CR><LF>
 [ body ]<CR><LF>

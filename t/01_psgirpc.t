@@ -24,9 +24,9 @@ do {
     };
     my $packed_header = sprintf "0.9 %s 3 509\015\012", $req_id;
 
-    my $packed = PSGIRPC::from_psgi_request($req_id, 3, $psgi_req);
+    my $packed = PSGIRPC::from_psgi_request($req_id, 3, 'reqtest', $psgi_req);
     my $got_packed_header = $packed;
-    $got_packed_header =~ s/^([^\015]+\015\012).+$/$1/s;
+    $got_packed_header =~ s/^([^\015]+\015\012)reqtest\015\012.+$/$1/s;
     is($got_packed_header, $packed_header, 'request packed');
 
 
@@ -36,6 +36,7 @@ do {
         request_id  => $req_id,
         serializer  => 3,
         header_size => 509,
+        ua          => 'reqtest',
     }, 'request headers');
 
     $unpacked->{'psgi.input'}  = $psgi_req->{'psgi.input'};
@@ -53,9 +54,9 @@ do {
         [ 'hokke' ]
     ];
     my $packed_header = sprintf "0.9 %s 3 112 200\015\012", $req_id;
-    my $packed = PSGIRPC::from_psgi_response($req_id, 3, $psgi_res);
+    my $packed = PSGIRPC::from_psgi_response($req_id, 3, 'restest', $psgi_res);
     my $got_packed_header = $packed;
-    $got_packed_header =~ s/^([^\015]+\015\012).+$/$1/s;
+    $got_packed_header =~ s/^([^\015]+\015\012)restest\015\012.+$/$1/s;
     is($got_packed_header, $packed_header, 'response packed');
 
 
@@ -66,6 +67,7 @@ do {
         serializer  => 3,
         header_size => 112,
         status      => 200,
+        ua          => 'restest',
     }, 'request headers');
 
     $unpacked->[2] = ['hokke'];

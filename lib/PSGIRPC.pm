@@ -28,8 +28,9 @@ sub _unpack {
 
 sub _unpack_prepare {
     my($packed, $header) = @_;
+    my $ua;
     unless ($header) {
-        ($packed, $header) = $packed =~ /^(.+?\015\012)(.+)/s;
+        ($packed, $ua, $header) = $packed =~ /^(.+?\015\012)(.+?)\015\012(.+)/s;
     }
     $packed =~ s/\015\012$//;
     my(@ret) = split ' ', $packed;
@@ -39,18 +40,18 @@ sub _unpack_prepare {
         request_id  => $ret[1],
         serializer  => $ret[2],
         header_size => $ret[3],
-
+        ua          => $ua,
     };
     ($rpc_header, $header, \@ret);
 }
 
 sub from_psgi_request {
-    my($req_id, $serializer, $psgi) = @_;
+    my($req_id, $serializer, $ua, $psgi) = @_;
     my $strip_env = +{ %{ $psgi } };
     delete $strip_env->{'psgi.input'};
     delete $strip_env->{'psgi.errors'};
     my $dump = _pack($serializer, $strip_env);
-    sprintf "0.9 %s %s %d\015\012%s\015\012", $req_id, $serializer, length($dump), $dump;
+    sprintf "0.9 %s %s %d\015\012$ua\015\012%s\015\012", $req_id, $serializer, length($dump), $dump;
 }
 
 sub to_psgi_request {
@@ -60,9 +61,9 @@ sub to_psgi_request {
 }
 
 sub from_psgi_response {
-    my($req_id, $serializer, $psgi) = @_;
+    my($req_id, $serializer, $ua, $psgi) = @_;
     my $dump = _pack($serializer, $psgi->[1]);
-    sprintf "0.9 %s %s %d %s\015\012%s\015\012", $req_id, $serializer, length($dump), $psgi->[0], $dump;
+    sprintf "0.9 %s %s %d %s\015\012$ua\015\012%s\015\012", $req_id, $serializer, length($dump), $psgi->[0], $dump;
 }
 
 sub to_psgi_response {
